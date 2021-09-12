@@ -1,0 +1,49 @@
+/**
+ *Submitted for verification at BscScan.com on 2021-06-25
+*/
+
+pragma solidity ^0.5.10;
+
+interface ERC20Interface {
+  function transferFrom(address _from, address _to, uint _value) external returns (bool);
+}
+interface ERC721Interface {
+  function transferFrom(address _from, address _to, uint _tokenId) external ;
+}
+contract Ownable {
+  address public owner;
+
+  constructor () public{
+    owner = msg.sender;
+  }
+
+  modifier onlyOwner()  {
+    require(msg.sender == owner);
+    _;
+  }
+
+  function transferOwnership(address newOwner) public onlyOwner {
+
+    if (newOwner != address(0)) {
+      owner = newOwner;
+    }
+  }
+}
+
+contract Proxy is Ownable {
+
+    function sold ( address  tokenContract,
+                    address  from,
+                    address[] memory desAddress,
+                    uint[] memory amounts,
+                    address  nftAddess,
+                    address  nftHolder,
+                    uint  tokenId) public onlyOwner{
+
+        for( uint i = 0 ; i < desAddress.length ; i++ ) {
+            ERC20Interface(tokenContract).transferFrom(from,desAddress[i],amounts[i]);
+        }
+
+        ERC721Interface(nftAddess).transferFrom(nftHolder,from,tokenId);
+   }
+}
